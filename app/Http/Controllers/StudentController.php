@@ -9,9 +9,8 @@ use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
-  /**
-   * //LOGIC để index,thêm,sửa,xóa
-     * Display a listing of the resource.
+    /**
+     * Hiển thị danh sách sinh viên có phân trang.
      */
     public function index()
     {
@@ -20,7 +19,7 @@ class StudentController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Hiển thị form tạo mới sinh viên.
      */
     public function create()
     {
@@ -28,21 +27,24 @@ class StudentController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Lưu sinh viên mới vào cơ sở dữ liệu.
      */
     public function store(StoreStudentRequest $request)
     {
-        $data = $request->except('image');
+        $data = $request->validated();
+
         if ($request->hasFile('image')) {
             $data['image'] = Storage::put('students', $request->file('image'));
         }
-        Student::create($data); // Sửa chỗ này, bỏ 1 lần gọi `create()`
+
+        Student::create($data);
+
         return redirect()->route('students.index')
-            ->with('success', 'Thao tác thành công');
+            ->with('success', 'Thêm mới sinh viên thành công!');
     }
 
     /**
-     * Display the specified resource.
+     * Hiển thị chi tiết thông tin sinh viên.
      */
     public function show(Student $student)
     {
@@ -50,7 +52,7 @@ class StudentController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Hiển thị form chỉnh sửa sinh viên.
      */
     public function edit(Student $student)
     {
@@ -58,36 +60,32 @@ class StudentController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Cập nhật thông tin sinh viên.
      */
     public function update(UpdateStudentRequest $request, Student $student)
     {
-        $data = $request->except('image');
+        $data = $request->validated();
 
         if ($request->hasFile('image')) {
+            $student->deleteImage();
             $data['image'] = Storage::put('students', $request->file('image'));
         }
 
-        $currentPathImage = $student->image;
         $student->update($data);
 
-        // Sửa lỗi kiểm tra trước khi xóa ảnh cũ
-        if ($request->hasFile('image') && $currentPathImage && Storage::exists($currentPathImage)) {
-            Storage::delete($currentPathImage);
-        }
-
-        return back()->with('success', 'Thao tác thành công');
+        return redirect()->route('students.index')
+            ->with('success', 'Cập nhật sinh viên thành công!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Xóa sinh viên khỏi cơ sở dữ liệu (tự động xóa ảnh kèm theo).
      */
     public function destroy(Student $student)
     {
         $student->delete();
-        if (Storage::exists($student->image)) {
-            Storage::delete($student->image);
-        }
-        return back()->with('success', 'Thao tác thành công');
+
+        return redirect()->route('students.index')
+            ->with('success', 'Xóa sinh viên thành công!');
     }
 }
+

@@ -1,66 +1,99 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎓 Hệ Thống Quản Lý Sinh Viên (Laravel CRUD & API)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Ứng dụng quản lý thông tin sinh viên xây dựng trên nền tảng **Laravel**, hỗ trợ đầy đủ các thao tác Thêm, Xem, Sửa, Xóa (CRUD) qua cả giao diện Web (Blade) và RESTful API.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Tính Năng Chính
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Giao diện Web (Blade + Bootstrap 5)**: Danh sách phân trang, form thêm/sửa tái sử dụng component, thông báo flash alerts, xem chi tiết và upload hình ảnh.
+- **RESTful API**: Hỗ trợ đầy đủ các endpoint (GET, POST, PUT, DELETE) với validation tự động và HTTP status code chuẩn.
+- **Xử lý hình ảnh tự động**: Upload ảnh vào Storage và tự động dọn dẹp file vật lý khi bản ghi bị xóa hoặc cập nhật ảnh mới.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🛠️ Yêu Cầu Hệ Thống
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **PHP** >= 8.1
+- **Composer** >= 2.x
+- **MySQL** hoặc cơ sở dữ liệu tương thích
+- **Web Server**: Laravel Herd, Laragon, XAMPP hoặc PHP Built-in Server
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## ⚡ Hướng Dẫn Cài Đặt & Chạy Nhanh
 
-## Laravel Sponsors
+1. **Cài đặt dependencies**:
+   ```bash
+   composer install
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+2. **Cấu hình môi trường**:
+   Sao chép `.env.example` thành `.env` và cấu hình database:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-### Premium Partners
+3. **Chạy Migration & Tạo Storage Link**:
+   ```bash
+   php artisan migrate
+   php artisan storage:link
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+4. **Khởi chạy ứng dụng**:
+   ```bash
+   php artisan serve
+   ```
+   Truy cập Web tại: `http://127.0.0.1:8000/students`
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 📌 Danh Sách Routes & API Endpoints
 
-## Code of Conduct
+### 1. Web Routes (`routes/web.php`)
+| Phương thức | URI | Tên Route | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/students` | `students.index` | Danh sách sinh viên (phân trang) |
+| `GET` | `/students/create` | `students.create` | Form thêm mới sinh viên |
+| `POST` | `/students` | `students.store` | Lưu sinh viên mới |
+| `GET` | `/students/{student}` | `students.show` | Xem chi tiết sinh viên |
+| `GET` | `/students/{student}/edit` | `students.edit` | Form chỉnh sửa sinh viên |
+| `PUT/PATCH` | `/students/{student}` | `students.update` | Cập nhật thông tin sinh viên |
+| `DELETE` | `/students/{student}` | `students.destroy` | Xóa sinh viên |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 2. RESTful API Endpoints (`routes/api.php`)
+| Phương thức | Endpoint | Mô tả | Mã phản hồi |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/students` | Lấy danh sách sinh viên | `200 OK` |
+| `POST` | `/api/students` | Tạo mới sinh viên | `201 Created` |
+| `GET` | `/api/students/{id}` | Lấy chi tiết 1 sinh viên | `200 OK` |
+| `PUT/PATCH` | `/api/students/{id}` | Cập nhật thông tin | `200 OK` |
+| `DELETE` | `/api/students/{id}` | Xóa sinh viên | `200 OK` |
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 📂 Cấu Trúc Mã Nguồn Chính
 
-## License
+```text
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── StudentController.php         # Controller giao diện Web
+│   │   └── Api/StudentController.php     # Controller API
+│   └── Requests/
+│       ├── StoreStudentRequest.php       # FormRequest validate khi thêm mới
+│       └── UpdateStudentRequest.php      # FormRequest validate khi cập nhật
+└── Models/
+    └── Student.php                       # Model + Event tự động dọn ảnh storage
+resources/views/
+├── master.blade.php                      # Layout chính
+├── partials/alerts.blade.php             # Component thông báo flash & lỗi
+└── students/
+    ├── _form.blade.php                   # Form dùng chung (Create/Edit)
+    ├── index.blade.php                   # Trang danh sách
+    ├── create.blade.php                  # Trang thêm mới
+    ├── edit.blade.php                    # Trang chỉnh sửa
+    └── show.blade.php                    # Trang chi tiết
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

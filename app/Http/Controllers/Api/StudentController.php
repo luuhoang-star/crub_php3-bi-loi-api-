@@ -3,101 +3,81 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreStudentRequest;
+use App\Http\Requests\UpdateStudentRequest;
 use App\Models\Student;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-
 
 class StudentController extends Controller
 {
-//full api index/store/update/destroy
     /**
-     * Display a listing of the resource.
+     * Danh sách sinh viên có phân trang.
      */
     public function index()
     {
         $data = Student::query()->latest('id')->paginate(5);
         return response()->json($data);
-    }   // hiển thị dữ liệu về api(index), destroy thì api về trắng tinh như giấy
+    }
 
     /**
-     * Show the form for creating a new resource.
+     * Tạo mới sinh viên.
      */
-
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreStudentRequest $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'code' => 'required|max:255|unique:students',
-        //     'name' => 'required|max:255',
-        //     'email' => 'required|max:191|unique:students',
-        //     'phone' => 'required|max:255',
-        //     'image' => 'required|image',
-        // ]);
-        // if ($validator->fails()) {
-        //     return response()->json($validator->errors(), 422);
-        // }  <!-- VALIDATE API Thêm-->
-        $data = $request->except('image');
+        $data = $request->validated();
+
         if ($request->hasFile('image')) {
             $data['image'] = Storage::put('students', $request->file('image'));
         }
-        Student::query()->create($data);
-        return response()->json([], 204);
+
+        $student = Student::create($data);
+
+        return response()->json([
+            'message' => 'Tạo sinh viên thành công',
+            'data'    => $student,
+        ], 201);
     }
+
+    /**
+     * Chi tiết sinh viên.
+     */
     public function show(Student $student)
     {
-        return response()->json($student);
+        return response()->json([
+            'data' => $student,
+        ]);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Cập nhật thông tin sinh viên.
      */
-
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Student $student)
+    public function update(UpdateStudentRequest $request, Student $student)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'code' => ['required', 'max:255', Rule::unique('students')->ignore($student->id)],
-        //     'name' => 'required|max:255',
-        //     'email' => ['required', 'email', 'max:191', Rule::unique('students')->ignore($student->id)],
-        //     'phone' => 'required|max:255',
-        //     'image' => ['image', Rule::requiredIf(empty($student->image))],
-        // ]);
-        // if ($validator->fails()) {
-        //     return response()->json($validator->errors(), 422);
-        // }
+        $data = $request->validated();
 
-
-        $data = $request->except('image');
         if ($request->hasFile('image')) {
+            $student->deleteImage();
             $data['image'] = Storage::put('students', $request->file('image'));
         }
 
-        $currentPathImage = $student->image;
         $student->update($data);
 
-        if ($request->hasFile('image') && Storage::exists($currentPathImage)) {
-            Storage::delete($currentPathImage);
-        }
-        return response()->json($student);
-        /**
-         * Remove the specified resource from storage.
-         */
+        return response()->json([
+            'message' => 'Cập nhật sinh viên thành công',
+            'data'    => $student,
+        ]);
     }
+
+    /**
+     * Xóa sinh viên (tự động dọn dẹp ảnh storage).
+     */
     public function destroy(Student $student)
     {
         $student->delete();
-        if (Storage::exists($student->image)) {
-            Storage::delete($student->image);
-        }
-        return response()->json([], 204);
+
+        return response()->json([
+            'message' => 'Xóa sinh viên thành công',
+        ], 200);
     }
 }
+
